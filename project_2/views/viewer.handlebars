@@ -1,0 +1,85 @@
+<div>
+  <p class="entryTitle viewerTitle"> User Whoever's adventures!</p>
+  <div id="mapid"></div>
+
+    <div class="row">
+      <div class="col-1"></div>
+      <div class="col-10"> 
+  <button class="newEntryBut collapsible">Click here to add enter a new Log!</button>
+    <div class="content">
+      <formid="newEntry">
+      <div class="form-group">
+        <label for="attractionName">What was the name of the attraction?  </label>
+        <textarea class="form-control" id="attractionName" placeholder='(example: "AT&T Stadium")' rows="1"></textarea>
+        <label for="attractionLocation">Where is this attraction?</label>
+        <textarea class="form-control" id="attractionLocation" placeholder='Please enter address and zip code (example: "1 AT&T Way, Arlington, TX 76011" or just "1 AT&T Way, 76011")' rows="1"></textarea>
+        <label for="attractionDescription">What did you do here?</label>
+        <textarea class="form-control" id="attractionDescription" placeholder='(example: "Got to see the Dallas Cowboys shut down some chump team!")' rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary pinner">Pin it!</button>
+    </form>
+  </div>
+  <ul>
+  {{#each logs}}
+        <li class="entryLog" data-id="{{id}}">
+          <p class="entryTitle">{{location}}</p>
+          {{!-- navbar-brand makes the link font larger --}}
+          {{!-- <ul class="nav nav-tabs nav-fill">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Entry <span class="sr-only">(current)</span></a>
+            </li> REMOVED UNTIL PHOTOS ARE WORKING--}}
+  {{!-- need to dynamically change these hrefs to make the selected tab "current" without refreshing               --}}
+    {{!-- once we move past the entry step, we'll change the href of the entry to go back to that step (same with the gallery)  --}}
+    {{!-- we'll remove the "disabled" class from these after an entry has been saved --}}
+            {{!-- <li class="nav-item">
+              <a class="nav-link" href="#">Gallery</a>
+            </li>
+          </ul> REMOVED UNTIL PHOTOS ARE WORKING --}}
+          <div class="entry entryTitle">
+            <p>{{journal_entry}}</p>
+          </div>
+      
+  {{!-- Try to look into a way that our tripEntry (if very long) will default to only showing the first 3-5 lines (maybe with a clickable extender/minimizer), so each entry doesnt take up too much room         --}}
+        </li>
+  {{/each}}
+  </ul>
+  </div>
+      <div class="col-1"></div>
+    </div>
+</div>
+<script type="text/javascript" src="assets/js/expedilog.js"></script>
+<script type="text/javascript">
+  var mymap = L.map('mapid').setView([37.0902, -95.7129], 5);
+
+L.tileLayer(
+  "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}",
+  {
+    attribution:
+      'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: "mapbox/streets-v11",
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken:
+      "pk.eyJ1Ijoic2hhd24yMjBhIiwiYSI6ImNrNnY0MnAycjBnM2UzbnBhNTF3dm8ycm8ifQ.aKQXbriGCk9DpMsks6Cwpw"
+  }
+).addTo(mymap);
+
+function makeMarkers() {
+  let markersArr = [];
+  $.ajax("/api/logs", {
+    type: "GET",
+    data: data
+  }).then(
+    function(data) {
+      markersArr.push(data);
+      markersArr.forEach(mark => {
+        var marker = L.marker([mark.latitude, mark.longitude]).addTo(mymap);
+      })
+      // console.log("created new entry");
+      // Reload the page to get the updated list
+      location.reload();
+    }
+  );
+}
+</script>
